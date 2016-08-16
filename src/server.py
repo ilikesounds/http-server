@@ -14,7 +14,6 @@ def server():
         server.bind(address)
         server.listen(1)
         conn, addr = server.accept()
-
         buffer_length = 32
         message_complete = False
         part = b''
@@ -23,7 +22,7 @@ def server():
             part += partial_mes
             if len(partial_mes) < buffer_length:
                 message_complete = True
-        print(part.decode('utf8'))
+        print(u'received message: ', part.decode('utf8'))
         conn.sendall(part)
         conn.close()
         server.close()

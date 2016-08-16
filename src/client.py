@@ -4,6 +4,9 @@
 import socket
 
 
+import sys
+
+
 def client(message):
     """Set up a client socket, send and receive a msg from a server."""
     infos = socket.getaddrinfo('127.0.0.1', 5000)
@@ -23,3 +26,8 @@ def client(message):
     print(part.decode('utf-8'))
     client.close()
     return part.decode('utf-8')
+
+
+if __name__ == '__main__':
+    message = sys.argv[1]
+    client(message)
