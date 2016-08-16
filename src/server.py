@@ -20,13 +20,10 @@ def server():
         part = b''
         while not message_complete:
             partial_mes = conn.recv(buffer_length)
-            print('partial_mes ', partial_mes)
             part += partial_mes
-            print('part before if', part)
             if len(partial_mes) < buffer_length:
                 message_complete = True
-        print('part after if', part.decode('utf8'))
+        print(part.decode('utf8'))
         conn.sendall(part)
         conn.close()
         server.close()
-        

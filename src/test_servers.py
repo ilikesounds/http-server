@@ -6,9 +6,6 @@ import pytest
 from client import client
 
 
-from server import server
-
-
 TEST_TABLE = [
     ('test', 'test'),
     ('test' * 20, 'test' * 20),
