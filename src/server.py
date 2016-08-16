@@ -26,3 +26,7 @@ def server():
         conn.sendall(part)
         conn.close()
         server.close()
+
+
+if __name__ == '__main__':
+    server()

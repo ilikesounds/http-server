@@ -10,7 +10,7 @@ TEST_TABLE = [
     ('test', 'test'),
     ('test' * 20, 'test' * 20),
     ('test' * 8, 'test' * 8),
-    ('¡', '¡')
+    ('¡', u'¡')
 ]
 
 
