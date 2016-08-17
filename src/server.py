@@ -22,10 +22,22 @@ def server():
             part += partial_mes
             if len(partial_mes) < buffer_length:
                 message_complete = True
-        print(u'received message: ', part.decode('utf8'))
-        conn.sendall(part)
+                part_decoded_to_unicode = part.decode('utf8')
+        print(u'request:\r\n', part_decoded_to_unicode)
+        conn.sendall(response_ok())
         conn.close()
         server.close()
+        return part_decoded_to_unicode
+
+
+def response_ok():
+    response = 'HTTP/1.1 200 OK \r\n\r\n Success'
+    return response.encode('utf8')
+
+
+def response_error():
+    response = 'HTTP/1.1 500 Internal_Server_Error'
+    return response.encode('utf8')
 
 
 if __name__ == '__main__':
