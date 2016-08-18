@@ -11,8 +11,8 @@ def server():
     while True:
         print('started')
         server = socket.socket()
-        server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         address = ('127.0.0.1', 5000)
+        server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         server.bind(address)
         server.listen(1)
         conn, addr = server.accept()
@@ -26,6 +26,7 @@ def server():
                 message_complete = True
                 full_mes_decoded_to_unicode = full_mes.decode('utf8')
         print(u'request:\r\n', full_mes_decoded_to_unicode)
+        parse_req(full_mes)
         conn.sendall(response_ok())
         conn.close()
         server.close()
@@ -60,7 +61,6 @@ def response_deconstructor(response):
     response_msg = response
     uresponse = response_msg.decode('utf8')
     CRLF = '\r\n'
-    uresponse.split(CRLF)
     first_pass = uresponse.split(CRLF+CRLF, 1)
     head, body = first_pass
     head_lines = head.split(CRLF)
@@ -70,6 +70,28 @@ def response_deconstructor(response):
     headers_dict = {k.lower(): v.strip() for k, v in headers_split}
     return [protocol, status, msg, headers_dict,
             str(len(body)), str(len(first_pass))]
+
+
+def request_deconstructor(request):
+    """Deconstruct request into basic components.
+    Return method, protocol and validates host header"""
+    request_msg = request
+    urequest = request_msg.decode('utf8')
+    CRLF = '\r\n'
+    first_pass = urequest.split(CRLF+CRLF, 1)
+    head, body = first_pass
+    head_lines = head.split(CRLF)
+    method, path, protocol = head_lines[0].split()
+    headers = head_lines[1:]
+    headers_split = [header.split(':', 1) for header in headers]
+    headers_dict = {k.lower(): v.strip() for k, v in headers_split}
+    return [method, path, protocol, headers_dict, str(len(first_pass))]
+
+
+def parse_req(request):
+    print(request)
+    # req_decon = request_deconstructor(request)
+    # try:
 
 
 def response_error():
