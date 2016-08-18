@@ -3,7 +3,6 @@
 
 import socket
 
-
 import sys
 
 
@@ -21,15 +20,15 @@ def client(message):
     client.shutdown(socket.SHUT_WR)
     buffer_length = 32
     reply_complete = False
-    part = b''
+    full_mes = b''
     while not reply_complete:
         partial_mes = client.recv(buffer_length)
-        part += partial_mes
+        full_mes += partial_mes
         if len(partial_mes) < buffer_length:
             reply_complete = True
-    print(part.decode('utf-8'))
+    print(full_mes.decode('utf-8'))
     client.close()
-    return part.decode('utf-8')
+    return full_mes.decode('utf-8')
 
 
 if __name__ == '__main__':

@@ -2,43 +2,33 @@
 '''These are tests for client.py and server.py'''
 import pytest
 
+from server import response_ok, response_error, response_deconstructor
 
-# from client import client
-from server import response_ok, response_error, server
+RESPONSE_TABLE = [
+   ('content-length', response_deconstructor(response_ok())[3]),
+   ('content-type', response_deconstructor(response_ok())[3]),
+   ('date', response_deconstructor(response_ok())[3]),
+]
 
-
-# TEST_TABLE = [
-#     ('test', 'test'),
-#     ('test' * 20, 'test' * 20),
-#     ('test' * 8, 'test' * 8),
-#     ('¡', u'¡')
-# ]
-
-
-# @pytest.mark.parametrize('message, result', TEST_TABLE)
-# def test_client(message, result):
-#     assert client(message) == result
-
-
-def test_response_ok_type():
-    type_response = type(response_ok())
-    type_to_compare = type(b'abc')
-    assert type_response == type_to_compare
+FIRST_LINE_TABLE = [
+   ('HTTP/1.1', response_deconstructor(response_ok())[0]),
+   ('200', response_deconstructor(response_ok())[1]),
+   ('OK', response_deconstructor(response_ok())[2]),
+   ('8', response_deconstructor(response_ok())[4]),
+   ('2', response_deconstructor(response_ok())[5]),
+   ('HTTP/1.1', response_deconstructor(response_error())[0]),
+   ('500', response_deconstructor(response_error())[1]),
+   ('Internal_Server_Error', response_deconstructor(response_error())[2]),
+   ('7', response_deconstructor(response_error())[4]),
+   ('2', response_deconstructor(response_error())[5])
+]
 
 
-def test_contents_response_ok():
-    response = response_ok().split()
-    assert response[0] == b'HTTP/1.1' and response[1] == b'200' and \
-        response[2] == b'OK' and response[3] == b'Success'
+@pytest.mark.parametrize('part, result', RESPONSE_TABLE)
+def test_response_ok(part, result):
+    assert part in result
 
 
-def test_response_error_type():
-    type_response = type(response_error())
-    type_to_compare = type(b'abc')
-    assert type_response == type_to_compare
-
-
-def test_contents_response_error():
-    response = response_error().split()
-    assert response[0] == b'HTTP/1.1' and response[1] == b'500' and \
-        response[2] == b'Internal_Server_Error'
+@pytest.mark.parametrize('part, result', FIRST_LINE_TABLE)
+def test_response_first_line(part, result):
+    assert part == result
