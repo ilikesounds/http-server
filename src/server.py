@@ -26,8 +26,10 @@ def server():
                 message_complete = True
                 full_mes_decoded_to_unicode = full_mes.decode('utf8')
         print(u'request:\r\n', full_mes_decoded_to_unicode)
-        parse_req(full_mes)
-        conn.sendall(response_ok())
+        if parse_req(full_mes):
+            conn.sendall(response_ok())
+        else:
+            conn.sendall(response_error(parse_req(full_mes)))
         conn.close()
         server.close()
 
@@ -90,13 +92,23 @@ def request_deconstructor(request):
 
 def parse_req(request):
     print(request)
-    # req_decon = request_deconstructor(request)
-    # try:
+    req_decon = request_deconstructor(request)
+    req_decon.extend(req_decon[3].keys())
+    try:
+        for word in req_decon:
+            try:
+                word in (u'GET',  u'HTTP/1.1', u'host')
+            except:
+                raise IndexError(u'This is not a ' + word + ' request')
+            else:
+                return True
+    except IndexError:
+        return word
 
 
-def response_error():
+def response_error(word):
     """Generate response_error."""
-    response = u'HTTP/1.1 500 Internal_Server_Error\r\n\r\nFailure'
+    response = u' ' + word + '400 Bad_Request' +'\r\n\r\nThis request does not have ' + word
     return response.encode('utf8')
 
 

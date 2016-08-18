@@ -36,7 +36,7 @@ REQUEST_TABLE1 = [
 
 
 REQUEST_TABLE2 = [
-    ('HOST', request_deconstructor(REQUEST_STRING)[3])
+    ('host', request_deconstructor(REQUEST_STRING)[3])
 ]
 
 
