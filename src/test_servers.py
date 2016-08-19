@@ -162,4 +162,4 @@ def test_receive_response():
     assert client(REQUEST_BAD[0]) == RESPONSE_DECISION[0][0]
     assert client(REQUEST_BAD[1]) == RESPONSE_DECISION[1][0]
     assert client(REQUEST_BAD[2]) == RESPONSE_DECISION[2][0]
-    assert client(REQUEST_GOOD) == RESPONSE_DECISION[3][0]
+    assert client(REQUEST_GOOD)[:17] == RESPONSE_DECISION[3][0][:17]

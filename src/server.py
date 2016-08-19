@@ -69,7 +69,7 @@ def response_deconstructor(response):
     headers_split = [header.split(':', 1) for header in headers]
     headers_dict = {k.lower(): v.strip() for k, v in headers_split}
     return [protocol, status, msg, headers_dict,
-            str(len(body)), str(len(first_pass))]
+            str(len(body))]
 
 
 def request_deconstructor(request):
@@ -85,11 +85,6 @@ def request_deconstructor(request):
     headers_split = [header.split(':', 1) for header in headers]
     headers_dict = {k.lower(): v.strip() for k, v in headers_split}
     return [method, path, protocol, headers_dict, str(len(first_pass))]
-
-# '405 Method Not Allowed'
-# '505 HTTP Version Not supported'
-# '400 Bad request'
-# '404 Not Found'
 
 
 class HTTPException(Exception):
@@ -149,5 +144,5 @@ def response_decision(full_mes):
         uri = parse_req(full_mes)
     return [response, uri]
 
-# if __name__ == '__main__':
-#     server()
+if __name__ == '__main__':
+    server()

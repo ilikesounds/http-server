@@ -3,8 +3,6 @@
 
 import socket
 
-import sys
-
 
 def client(message):
     """Set up a client socket, send and receive a msg from a server."""
@@ -17,7 +15,6 @@ def client(message):
     except AttributeError:
         pass
     client.sendall(message.encode('utf8'))
-    print(type(message))
     client.shutdown(socket.SHUT_WR)
     buffer_length = 32
     reply_complete = False
@@ -29,9 +26,4 @@ def client(message):
             reply_complete = True
     print(full_mes.decode('utf-8'))
     client.close()
-    return full_mes.decode('utf-8')
-
-
-# if __name__ == '__main__':
-#     message = sys.argv[1].encode('utf-8')
-#     client(message)
+    return full_mes
