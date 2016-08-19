@@ -3,8 +3,6 @@
 
 import socket
 
-import sys
-
 
 def client(message):
     """Set up a client socket, send and receive a msg from a server."""
@@ -28,9 +26,4 @@ def client(message):
             reply_complete = True
     print(full_mes.decode('utf-8'))
     client.close()
-    return full_mes.decode('utf-8')
-
-
-if __name__ == '__main__':
-    message = sys.argv[1]
-    client(message)
+    return full_mes
