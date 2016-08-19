@@ -2,8 +2,9 @@
 # This is an http-server#
 
 import socket
-
+import io
 import email.utils
+from mimetypes import guess_type
 
 CRLF = '\r\n'
 
@@ -143,6 +144,14 @@ def response_decision(full_mes):
         response = response_ok()
         uri = parse_req(full_mes)
     return [response, uri]
+
+
+def resolve_uri(uri):
+    files = io.open(uri, 'rb')
+    mime = guess_type(uri)
+    read_file = files.read()
+    files.close()
+    return read_file, mime
 
 if __name__ == '__main__':
     server()
