@@ -48,7 +48,9 @@ REQUEST_BAD = [
     b'GET /favicon.ico HTTP/1.0\r\nHost: 127.0.0.1:5000\r\n'
     b'Connection: keep-alive\r\n\r\n',
 
-    b'GET /favicon.ico HTTP/1.1\r\nConnection: keep-alive\r\n\r\n'
+    b'GET /favicon.ico HTTP/1.1\r\nConnection: keep-alive\r\n\r\n',
+
+    b'GET /favicon.ico HTTP/1.1\r\nConnecti'
 ]
 
 RESPONSE_DECISION = [
@@ -67,7 +69,11 @@ RESPONSE_DECISION = [
     (b'HTTP/1.1 200 OK\r\nDate: Fri, 19 Aug 2016 04:28:51 GMT\r\n'
      b'Content-Length: 8\r\nContent-Type: text/plain; charset=utf-8\r\n\r\n'
      b'Success!',
-     u'/favicon.ico')
+     u'/favicon.ico'),
+
+    (b'HTTP/1.1 500 Internal Server Error\r\n\r\n'
+     b'Something went wrong.',
+     'None')
 ]
 
 
@@ -138,10 +144,15 @@ def test_response_decision_generate_error_response():
      error message and returns URI = None given a bad request."""
     assert response_decision(REQUEST_BAD[0])[0] == RESPONSE_DECISION[0][0]
     assert response_decision(REQUEST_BAD[0])[1] == RESPONSE_DECISION[0][1]
+
     assert response_decision(REQUEST_BAD[1])[0] == RESPONSE_DECISION[1][0]
     assert response_decision(REQUEST_BAD[1])[1] == RESPONSE_DECISION[1][1]
+
     assert response_decision(REQUEST_BAD[2])[0] == RESPONSE_DECISION[2][0]
     assert response_decision(REQUEST_BAD[2])[1] == RESPONSE_DECISION[2][1]
+
+    assert response_decision(REQUEST_BAD[3])[0] == RESPONSE_DECISION[4][0]
+    assert response_decision(REQUEST_BAD[3])[1] == RESPONSE_DECISION[4][1]
 
 
 def test_response_decision_generate_ok_response():
