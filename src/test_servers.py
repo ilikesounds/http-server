@@ -3,7 +3,7 @@
 import pytest
 
 from server import response_ok, response_deconstructor,\
- request_deconstructor, parse_req, response_decision
+ request_deconstructor, parse_req, response_decision, resolve_uri
 
 from client import client
 
@@ -174,3 +174,40 @@ def test_receive_response():
     assert client(REQUEST_BAD[1]) == RESPONSE_DECISION[1][0]
     assert client(REQUEST_BAD[2]) == RESPONSE_DECISION[2][0]
     assert client(REQUEST_GOOD)[:17] == RESPONSE_DECISION[3][0][:17]
+
+RESOLVE_URI = [
+    ('./webroot/sample.txt', 1, ('text/plain', None)),
+    ('./webroot/a_web_page.html', 1, ('text/html', None)),
+    ('./webroot/make_time.py', 1, ('text/x-python', None)),
+    ('./webroot/images/sample_1.png', 1, ('image/png', None)),
+    ('./webroot/images/JPEG_example.jpg', 1, ('image/jpeg', None)),
+    ('./webroot/empty_file.txt', 1, ('text/plain', None)),
+]
+
+
+EMPTY_URI = [
+   ('./webroot/non_existant_file.txt', 0, ('text/plain', None)),
+   ('./webroot/non_existant_folder', 0, ('text/html', None)),
+]
+
+
+@pytest.mark.parametrize('path, body, mimetype', RESOLVE_URI)
+def test_resolve_uri(path, body, mimetype):
+    """Test whether resolve_uri() returns body and mimetype
+        of a file given a path."""
+    assert resolve_uri(path)[0] is not None
+    assert resolve_uri(path)[1] == mimetype
+
+
+def test_resolve_uri_error1():
+    """Test whether resolve_uri() raises an appropriate error
+        if file not found"""
+    with pytest.raises(TypeError):
+        resolve_uri(EMPTY_URI[0])
+
+
+def test_resolve_uri_error2():
+    """Test whether resolve_uri() raises an appropriate error
+        if directory not found"""
+    with pytest.raises(TypeError):
+        resolve_uri(EMPTY_URI[1])

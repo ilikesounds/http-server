@@ -147,11 +147,15 @@ def response_decision(full_mes):
 
 
 def resolve_uri(uri):
-   files = io.open(uri, 'rb')
-   mime = guess_type(uri)
-   read_file = files.read()
-   files.close()
-   return read_file, mime
+    """Return body and mimetype for a given uri."""
+    try:
+        files = io.open(uri, 'rb')
+        mime = guess_type(uri)
+        read_file = files.read()
+        files.close()
+        return (read_file, mime)
+    except OSError:
+        pass
 
 if __name__ == '__main__':
     server()
