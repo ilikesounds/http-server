@@ -28,28 +28,8 @@ def server():
                 message_complete = True
                 full_mes_decoded_to_unicode = full_mes.decode('utf8')
         print(u'request:\r\n', full_mes_decoded_to_unicode)
-        try:
-            parse_req(full_mes)
-        except NotImplementedError:
-            response = HTTPException('405', 'Method Not Allowed', 'The server supports HTTP/1.1 only.').response_msg()
-            conn.sendall(response)
-        except TypeError:
-            response = HTTPException('505', 'HTTP Version Not supported', 'The server supports HTTP/1.1 only.').response_msg()
-            conn.sendall(response)
-        except NameError:
-            response = HTTPException('400', 'Bad Request', 'No <host> in headers.').response_msg()
-            conn.sendall(response)
-        except:
-            response = HTTPException('500', 'Internal Server Error', 'Something went wrong.').response_msg()
-            conn.sendall(response)
-            pass
-            print(u'500 error')
-        else:
-            response = response_ok()
-            conn.sendall(response)
-        # finally:
-        #     print(type(response))
-        #     conn.sendall(response)
+        response_mes, uri = response_decision(full_mes)
+        conn.sendall(response_mes)
         conn.close()
         server.close()
 
@@ -98,7 +78,6 @@ def request_deconstructor(request):
     request_msg = request
     urequest = request_msg.decode('utf8')
     first_pass = urequest.split(CRLF+CRLF, 1)
-    print(first_pass, type(urequest))
     head, body = first_pass
     head_lines = head.split(CRLF)
     method, path, protocol = head_lines[0].split()
@@ -127,27 +106,32 @@ class HTTPException(Exception):
 def parse_req(request):
     request_decon = request_deconstructor(request)
     print(request_decon)
-    if not request_decon[0] == u'GET':
+    if request_decon[0] != u'GET':
         raise NotImplementedError(u'Method not allowed')
-    if not request_decon[2] == u'HTTP/1.1':
+    elif request_decon[2] != u'HTTP/1.1':
         raise TypeError(u'Version of HTTP not supported')
-    if u'host' not in request_decon[3]:
+    elif u'host' not in request_decon[3]:
         raise NameError(u'No <host> in headers')
     return request_decon[1]
 
 
+def response_decision(full_mes):
+    uri = None
+    try:
+        parse_req(full_mes)
+    except NotImplementedError:
+        response = HTTPException('405', 'Method Not Allowed', 'The server supports HTTP/1.1 only.').response_msg()
+    except TypeError:
+        response = HTTPException('505', 'HTTP Version Not supported', 'The server supports HTTP/1.1 only.').response_msg()
+    except NameError:
+        response = HTTPException('400', 'Bad Request', 'No <host> in headers.').response_msg()
+    except:
+        response = HTTPException('500', 'Internal Server Error', 'Something went wrong.').response_msg()
+    else:
+        response = response_ok()
+        uri = parse_req(full_mes)
+    print(response, uri)
+    return [response, uri]
 
-
-# error_msg = HTTPException('400', 'Bad Request', 'No <host> in headers.').response_msg()
-# error_msg = HTTPException('405', 'Method Not Allowed', 'The server supports HTTP/1.1 only.').response_msg()
-# error_msg = HTTPException('505', 'HTTP Version Not supported', 'The server supports HTTP/1.1 only.').response_msg()
-
-
-def response_error(word):
-    """Generate response_error."""
-    response = u'HTTP/1.1+ 400 Bad_Request \r\n\r\nThis request does not have'
-    return response.encode('utf8')
-
-
-if __name__ == '__main__':
-    server()
+# if __name__ == '__main__':
+#     server()

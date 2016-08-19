@@ -32,6 +32,6 @@ def client(message):
     return full_mes.decode('utf-8')
 
 
-if __name__ == '__main__':
-    message = sys.argv[1]
-    client(message)
+# if __name__ == '__main__':
+#     message = sys.argv[1].encode('utf-8')
+#     client(message)
