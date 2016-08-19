@@ -152,3 +152,14 @@ def test_response_decision_generate_ok_response():
         RESPONSE_DECISION[3][0][:17]
     assert response_decision(REQUEST_GOOD)[1][:17] == \
         RESPONSE_DECISION[3][1]
+
+
+def test_receive_response():
+    """
+    Functional test which determines whether server
+    is sending back correct info to a client
+    """
+    assert client(REQUEST_BAD[0]) == RESPONSE_DECISION[0][0]
+    assert client(REQUEST_BAD[1]) == RESPONSE_DECISION[1][0]
+    assert client(REQUEST_BAD[2]) == RESPONSE_DECISION[2][0]
+    assert client(REQUEST_GOOD) == RESPONSE_DECISION[3][0]
