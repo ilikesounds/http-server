@@ -1,5 +1,5 @@
 # -*- encoding: utf-8 *-*
-'''This is an http-server'''
+# This is an http-server#
 
 import socket
 
@@ -93,19 +93,25 @@ def request_deconstructor(request):
 
 
 class HTTPException(Exception):
-    def __init__(self, code, reason, html_string):
+    def __init__(self, code, reason, msg_string):
+        """Initiate an instance of HTTPException
+         with attributes: <code>, <reason>, <msg_string>."""
         self.code = code
         self.reason = reason
-        self.html_string = html_string
+        self.msg_string = msg_string
 
     def response_msg(self):
+        """Generate an error message using <code>,
+         <reason>, <msg_string>. Return a byte-string"""
         template = u'HTTP/1.1 {} {}\r\n\r\n{}'
-        return template.format(self.code, self.reason, self.html_string).encode('utf-8')
+        return template.format(self.code, self.reason, self.msg_string)\
+            .encode('utf-8')
 
 
 def parse_req(request):
+    """Raise an appropriate error for a bad request or
+     return URI for a good request."""
     request_decon = request_deconstructor(request)
-    print(request_decon)
     if request_decon[0] != u'GET':
         raise NotImplementedError(u'Method not allowed')
     elif request_decon[2] != u'HTTP/1.1':
@@ -116,21 +122,31 @@ def parse_req(request):
 
 
 def response_decision(full_mes):
-    uri = None
+    """Based on the raised error, return an appropriate http-exception
+     and return URI = 'None'. Return an ok-response and URI for a
+     good request. Response = byte-string, uri = unicode-string."""
+    uri = u'None'
     try:
         parse_req(full_mes)
     except NotImplementedError:
-        response = HTTPException('405', 'Method Not Allowed', 'The server supports HTTP/1.1 only.').response_msg()
+        response = HTTPException(u'405', u'Method Not Allowed',
+                                 u'The server supports HTTP/1.1 only.')\
+            .response_msg()
     except TypeError:
-        response = HTTPException('505', 'HTTP Version Not supported', 'The server supports HTTP/1.1 only.').response_msg()
+        response = HTTPException(u'505', u'HTTP Version Not supported',
+                                 u'The server supports HTTP/1.1 only.')\
+            .response_msg()
     except NameError:
-        response = HTTPException('400', 'Bad Request', 'No <host> in headers.').response_msg()
+        response = HTTPException(u'400', u'Bad Request',
+                                 u'No <host> in headers.')\
+            .response_msg()
     except:
-        response = HTTPException('500', 'Internal Server Error', 'Something went wrong.').response_msg()
+        response = HTTPException(u'500', u'Internal Server Error',
+                                 u'Something went wrong.')\
+            .response_msg()
     else:
         response = response_ok()
         uri = parse_req(full_mes)
-    print(response, uri)
     return [response, uri]
 
 # if __name__ == '__main__':
