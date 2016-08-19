@@ -147,11 +147,11 @@ def response_decision(full_mes):
 
 
 def resolve_uri(uri):
-    files = io.open(uri, 'rb')
-    mime = guess_type(uri)
-    read_file = files.read()
-    files.close()
-    return read_file, mime
+   files = io.open(uri, 'rb')
+   mime = guess_type(uri)
+   read_file = files.read()
+   files.close()
+   return read_file, mime
 
 if __name__ == '__main__':
     server()
