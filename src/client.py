@@ -17,6 +17,7 @@ def client(message):
     except AttributeError:
         pass
     client.sendall(message.encode('utf8'))
+    print(type(message))
     client.shutdown(socket.SHUT_WR)
     buffer_length = 32
     reply_complete = False

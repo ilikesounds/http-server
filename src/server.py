@@ -5,6 +5,8 @@ import socket
 
 import email.utils
 
+CRLF = '\r\n'
+
 
 def server():
     """Set up a server socket, receive and send back a msg to a client."""
@@ -26,10 +28,28 @@ def server():
                 message_complete = True
                 full_mes_decoded_to_unicode = full_mes.decode('utf8')
         print(u'request:\r\n', full_mes_decoded_to_unicode)
-        if parse_req(full_mes):
-            conn.sendall(response_ok())
+        try:
+            parse_req(full_mes)
+        except NotImplementedError:
+            response = HTTPException('405', 'Method Not Allowed', 'The server supports HTTP/1.1 only.').response_msg()
+            conn.sendall(response)
+        except TypeError:
+            response = HTTPException('505', 'HTTP Version Not supported', 'The server supports HTTP/1.1 only.').response_msg()
+            conn.sendall(response)
+        except NameError:
+            response = HTTPException('400', 'Bad Request', 'No <host> in headers.').response_msg()
+            conn.sendall(response)
+        except:
+            response = HTTPException('500', 'Internal Server Error', 'Something went wrong.').response_msg()
+            conn.sendall(response)
+            pass
+            print(u'500 error')
         else:
-            conn.sendall(response_error(parse_req(full_mes)))
+            response = response_ok()
+            conn.sendall(response)
+        # finally:
+        #     print(type(response))
+        #     conn.sendall(response)
         conn.close()
         server.close()
 
@@ -49,7 +69,6 @@ def response_ok():
     lines.extend(header_lines)
     lines.append('')
     lines.append(body)
-    CRLF = '\r\n'
     response = CRLF.join(lines)
     response = response.encode('utf8')
     return response
@@ -62,7 +81,6 @@ def response_deconstructor(response):
     separated by first empty line."""
     response_msg = response
     uresponse = response_msg.decode('utf8')
-    CRLF = '\r\n'
     first_pass = uresponse.split(CRLF+CRLF, 1)
     head, body = first_pass
     head_lines = head.split(CRLF)
@@ -79,8 +97,8 @@ def request_deconstructor(request):
     Return method, protocol and validates host header"""
     request_msg = request
     urequest = request_msg.decode('utf8')
-    CRLF = '\r\n'
     first_pass = urequest.split(CRLF+CRLF, 1)
+    print(first_pass, type(urequest))
     head, body = first_pass
     head_lines = head.split(CRLF)
     method, path, protocol = head_lines[0].split()
@@ -89,26 +107,45 @@ def request_deconstructor(request):
     headers_dict = {k.lower(): v.strip() for k, v in headers_split}
     return [method, path, protocol, headers_dict, str(len(first_pass))]
 
+# '405 Method Not Allowed'
+# '505 HTTP Version Not supported'
+# '400 Bad request'
+# '404 Not Found'
+
+
+class HTTPException(Exception):
+    def __init__(self, code, reason, html_string):
+        self.code = code
+        self.reason = reason
+        self.html_string = html_string
+
+    def response_msg(self):
+        template = u'HTTP/1.1 {} {}\r\n\r\n{}'
+        return template.format(self.code, self.reason, self.html_string).encode('utf-8')
+
 
 def parse_req(request):
-    print(request)
-    req_decon = request_deconstructor(request)
-    req_decon.extend(req_decon[3].keys())
-    try:
-        for word in req_decon:
-            try:
-                word in (u'GET',  u'HTTP/1.1', u'host')
-            except:
-                raise IndexError(u'This is not a ' + word + ' request')
-            else:
-                return True
-    except IndexError:
-        return word
+    request_decon = request_deconstructor(request)
+    print(request_decon)
+    if not request_decon[0] == u'GET':
+        raise NotImplementedError(u'Method not allowed')
+    if not request_decon[2] == u'HTTP/1.1':
+        raise TypeError(u'Version of HTTP not supported')
+    if u'host' not in request_decon[3]:
+        raise NameError(u'No <host> in headers')
+    return request_decon[1]
+
+
+
+
+# error_msg = HTTPException('400', 'Bad Request', 'No <host> in headers.').response_msg()
+# error_msg = HTTPException('405', 'Method Not Allowed', 'The server supports HTTP/1.1 only.').response_msg()
+# error_msg = HTTPException('505', 'HTTP Version Not supported', 'The server supports HTTP/1.1 only.').response_msg()
 
 
 def response_error(word):
     """Generate response_error."""
-    response = u' ' + word + '400 Bad_Request' +'\r\n\r\nThis request does not have ' + word
+    response = u'HTTP/1.1+ 400 Bad_Request \r\n\r\nThis request does not have'
     return response.encode('utf8')
 
 
