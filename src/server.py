@@ -1,10 +1,12 @@
 # -*- encoding: utf-8 *-*
 # This is an http-server#
-
+from __future__ import unicode_literals
 import socket
 import io
 import email.utils
 from mimetypes import guess_type
+import os
+
 
 CRLF = '\r\n'
 
@@ -29,29 +31,39 @@ def server():
                 message_complete = True
                 full_mes_decoded_to_unicode = full_mes.decode('utf8')
         print(u'request:\r\n', full_mes_decoded_to_unicode)
-        response_mes, uri = response_decision(full_mes)
-        conn.sendall(response_mes)
+        response = response_decision(full_mes)
+        try:
+            response = response.encode('utf-8')
+        except (UnicodeDecodeError, AttributeError):
+            pass
+        conn.sendall(response)
         conn.close()
         server.close()
 
 
-def response_ok():
+def response_ok(body, mime=None):
     """Generate response_ok."""
+    try:
+        body = body.encode('utf-8')
+    except (UnicodeDecodeError, AttributeError):
+        pass
+    import pdb;pdb.set_trace()
     lines = []
     first_line = 'HTTP/1.1 200 OK'
     lines.append(first_line)
     headers = {}
-    body = 'Success!'
-    headers['Content-Type'] = 'text/plain; charset=utf-8'
-    headers['Content-Length'] = str(len(body.encode('utf8')))
+    headers['Content-Type'] = str(mime)
+    headers['Content-Length'] = str(len(body))
     now = email.utils.formatdate(usegmt=True)
     headers['Date'] = now
     header_lines = [': '.join(item) for item in headers.items()]
     lines.extend(header_lines)
     lines.append('')
-    lines.append(body)
-    response = CRLF.join(lines)
+    response = CRLF.join(lines) + CRLF
     response = response.encode('utf8')
+    print(type(response), response)
+    print(type(body), 'body')
+    response += body
     return response
 
 
@@ -61,10 +73,10 @@ def response_deconstructor(response):
     headers as dictionary, length of body, number of components
     separated by first empty line."""
     response_msg = response
-    uresponse = response_msg.decode('utf8')
-    first_pass = uresponse.split(CRLF+CRLF, 1)
+    delimeter = (CRLF+CRLF).encode('utf-8')
+    first_pass = response_msg.split(delimeter, 1)
     head, body = first_pass
-    head_lines = head.split(CRLF)
+    head_lines = head.decode('utf-8').split(CRLF)
     protocol, status, msg = head_lines[0].split()
     headers = head_lines[1:]
     headers_split = [header.split(':', 1) for header in headers]
@@ -126,36 +138,55 @@ def response_decision(full_mes):
         parse_req(full_mes)
     except NotImplementedError:
         response = HTTPException(u'405', u'Method Not Allowed',
-                                 u'The server supports HTTP/1.1 only.')\
-            .response_msg()
+                                 u'The server supports HTTP/1.1 only.')
+        response = response.response_msg()
     except TypeError:
         response = HTTPException(u'505', u'HTTP Version Not supported',
-                                 u'The server supports HTTP/1.1 only.')\
-            .response_msg()
+                                 u'The server supports HTTP/1.1 only.')
+        response = response.response_msg()
     except NameError:
         response = HTTPException(u'400', u'Bad Request',
-                                 u'No <host> in headers.')\
-            .response_msg()
+                                 u'No <host> in headers.')
+        response = response.response_msg()
     except:
         response = HTTPException(u'500', u'Internal Server Error',
-                                 u'Something went wrong.')\
-            .response_msg()
+                                 u'Something went wrong.')
+        response = response.response_msg()
     else:
-        response = response_ok()
         uri = parse_req(full_mes)
-    return [response, uri]
+        response = generate_response(uri)
+    return response
 
 
 def resolve_uri(uri):
-    """Return body and mimetype for a given uri."""
-    try:
+    """Return body and mimetype for a given uri or False if
+     source not found."""
+    if os.path.isfile(uri):
+        uri = os.path.relpath('/', '~/Users/tatinaphillips/cf/401/week2/day1/http-server/webroot/')
         files = io.open(uri, 'rb')
         mime = guess_type(uri)
         read_file = files.read()
         files.close()
         return (read_file, mime)
-    except OSError:
-        pass
+    elif os.path.isdir(uri):
+        return (str(os.listdir(uri)), None)
+    else:
+        return False
 
-if __name__ == '__main__':
-    server()
+
+def generate_response(uri):
+    """Generate a response based on the return of resolve_uri(uri):
+     a. - ok-message with body and mime if file was found,
+     b. - 404 Not Found error msg if file was not found."""
+    if resolve_uri(uri):
+        body, mime = resolve_uri(uri)
+        response = response_ok(body, mime)
+    else:
+        response = HTTPException('404', 'Resource Not Found',
+                                 "I can't find what you are  looking for.")
+        response = response.response_msg()
+    return response
+
+
+# if __name__ == '__main__':
+#     server()
