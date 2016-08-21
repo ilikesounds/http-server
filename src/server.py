@@ -182,5 +182,5 @@ def generate_response(uri):
     return response
 
 
-# if __name__ == '__main__':
-#     server()
+if __name__ == '__main__':
+    server()
