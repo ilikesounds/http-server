@@ -9,7 +9,7 @@ from server import response_ok, response_deconstructor,\
 from client import client
 
 REQUEST_GOOD = [
-    b'GET ./webroot HTTP/1.1\r\n'
+    b'GET / HTTP/1.1\r\n'
     b'Host: 127.0.0.1:5000\r\n'
     b'Connection: keep-alive\r\n'
     b'User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 '
@@ -22,15 +22,15 @@ REQUEST_GOOD = [
 ]
 
 REQUEST_BAD = [
-    b'POST ./webroot HTTP/1.1\r\nHost: 127.0.0.1:5000\r\n'
+    b'POST / HTTP/1.1\r\nHost: 127.0.0.1:5000\r\n'
     b'Connection: keep-alive\r\n\r\n',
 
-    b'GET ./webroot HTTP/1.0\r\nHost: 127.0.0.1:5000\r\n'
+    b'GET / HTTP/1.0\r\nHost: 127.0.0.1:5000\r\n'
     b'Connection: keep-alive\r\n\r\n',
 
-    b'GET ./webroot HTTP/1.1\r\nConnection: keep-alive\r\n\r\n',
+    b'GET / HTTP/1.1\r\nConnection: keep-alive\r\n\r\n',
 
-    b'GET ./webroot HTTP/1.1\r\nConnecti'
+    b'GET / HTTP/1.1\r\nConnecti'
 ]
 
 RESPONSE_ERROR = [
@@ -49,7 +49,7 @@ RESPONSE_ERROR = [
 
 RESPONSE_404 = [
     b'HTTP/1.1 404 Resource Not Found\r\n\r\n'
-    b"I can't find what you are  looking for."
+    b"HTTP Error 404: I can't find what you are looking for."
 ]
 
 RESPONSE_OK = [
@@ -60,7 +60,7 @@ RESPONSE_OK = [
 
 REQUEST_DECON_TABLE1 = [
     ('GET', request_deconstructor(REQUEST_GOOD[0])[0]),
-    ('./webroot', request_deconstructor(REQUEST_GOOD[0])[1]),
+    ('/', request_deconstructor(REQUEST_GOOD[0])[1]),
     ('HTTP/1.1', request_deconstructor(REQUEST_GOOD[0])[2]),
 ]
 
@@ -84,17 +84,17 @@ RESPONSE_DECON_TABLE2 = [
 ]
 
 GENERATE_RESPONSE = [
-    ('./webroot/sample.txt', '95', "('text/plain', None)"),
-    ('./webroot/a_web_page.html', '125', "('text/html', None)"),
-    ('./webroot/make_time.py', '278', "('text/x-python', None)"),
-    ('./webroot/images/sample_1.png', '8760', "('image/png', None)"),
-    ('./webroot/images/JPEG_example.jpg', '15138', "('image/jpeg', None)"),
-    ('./webroot/empty_file.txt', '0', "('text/plain', None)"),
+    ('/sample.txt', '95', "('text/plain', None)"),
+    ('/a_web_page.html', '125', "('text/html', None)"),
+    ('/make_time.py', '278', "('text/x-python', None)"),
+    ('/images/sample_1.png', '8760', "('image/png', None)"),
+    ('/images/JPEG_example.jpg', '15138', "('image/jpeg', None)"),
+    ('/empty_file.txt', '0', "('text/plain', None)"),
 ]
 
 EMPTY_URI = [
-   './webroot/non_existant_file.txt',
-   './webroot/non_existant_folder'
+   '/non_existant_file.txt',
+    '/non_existant_folder'
 ]
 
 
@@ -157,7 +157,7 @@ def test_parse_req_no_host():
 def test_parse_req_good():
     """Test whether parse_req(request) returns URI
     for an appropriatly formed request."""
-    assert parse_req(REQUEST_GOOD[0]) == './webroot'
+    assert parse_req(REQUEST_GOOD[0]) == '/'
 
 
 # Gave up - couldn't resolve errors,

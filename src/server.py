@@ -175,9 +175,9 @@ def generate_response(uri):
         response = response_ok(body, mime)
     else:
         response = HTTPException(
-            '404',
-            'Resource Not Found',
-            "HTTP Error 404: I can't find what you are looking for: ")
+            u'404',
+            u'Resource Not Found',
+            u"HTTP Error 404: I can't find what you are looking for.")
         response = response.response_msg()
     return response
 
