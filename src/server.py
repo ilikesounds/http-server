@@ -1,7 +1,7 @@
 # -*- encoding: utf-8 *-*
 # This is an http-server#
 from __future__ import unicode_literals
-import socket
+#import socket
 import io
 import email.utils
 from mimetypes import guess_type
@@ -12,28 +12,29 @@ CRLF = '\r\n'
 ABS_PATH = os.path.abspath(__file__).rsplit('/', 2)[0] + '/webroot'
 
 
-def server(address, server_socket):
+def server(socket, address):
     """Set up a server socket, receive and send back a msg to a client."""
+    # print('hi')
+    # socket.sendall(b'he')
     while True:
         print('started')
-        server = server_socket
+        #server = server_socket
         #address = ('127.0.0.1', 5000)
-        server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        server.bind(address)
-        server.listen(1)
-        conn, addr = server.accept()
+        #server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        #server.bind(address)
+        #socket.listen(1)
+        #conn, addr = socket.accept()
         buffer_length = 32
         message_complete = False
         request = b''
         while not message_complete:
-            buffer_req = conn.recv(buffer_length)
+            buffer_req = socket.recv(buffer_length)
             request += buffer_req
             if len(buffer_req) < buffer_length:
                 message_complete = True
         response = response_decision(request)
-        conn.sendall(response)
-        conn.close()
-        server.close()
+        socket.sendall(response)
+        socket.close()
 
 
 def response_ok(body, mime=None):
