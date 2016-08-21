@@ -2,7 +2,7 @@
 * A repository containing the http-server assignment for SEA PY 401d4
 * to start the server:
 ```
-$ run stream_server.py
+$ python stream_server.py
 ```
 * To send message from client to server:
 ```
