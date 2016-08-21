@@ -9,7 +9,7 @@ import os
 
 
 CRLF = '\r\n'
-HERE = os.path.abspath(__file__).rsplit('/', 2)[0] + '/webroot'
+ABS_PATH = os.path.abspath(__file__).rsplit('/', 2)[0] + '/webroot'
 
 
 def server():
@@ -30,8 +30,6 @@ def server():
             request += buffer_req
             if len(buffer_req) < buffer_length:
                 message_complete = True
-                unicode_request = request.decode('utf8')
-        print(u'request:\r\n', unicode_request)
         response = response_decision(request)
         conn.sendall(response)
         conn.close()
@@ -155,7 +153,7 @@ def response_decision(request):
 def resolve_uri(uri):
     """Return body and mimetype for a given uri or False if
      source not found."""
-    path = HERE + uri
+    path = ABS_PATH + uri
     if os.path.isfile(path):
         files = io.open(path, 'rb')
         mime = guess_type(path)
@@ -163,7 +161,7 @@ def resolve_uri(uri):
         files.close()
         return (read_file, mime)
     elif os.path.isdir(path):
-        return (path, None)
+        return (str(os.listdir(path)), None)
     else:
         return False
 
