@@ -12,12 +12,12 @@ CRLF = '\r\n'
 ABS_PATH = os.path.abspath(__file__).rsplit('/', 2)[0] + '/webroot'
 
 
-def server():
+def server(address, server_socket):
     """Set up a server socket, receive and send back a msg to a client."""
     while True:
         print('started')
-        server = socket.socket()
-        address = ('127.0.0.1', 5000)
+        server = server_socket
+        #address = ('127.0.0.1', 5000)
         server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         server.bind(address)
         server.listen(1)
