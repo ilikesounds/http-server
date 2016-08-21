@@ -1,7 +1,6 @@
 # -*- encoding: utf-8 *-*
 # This is an http-server#
 from __future__ import unicode_literals
-#import socket
 import io
 import email.utils
 from mimetypes import guess_type
@@ -14,16 +13,8 @@ ABS_PATH = os.path.abspath(__file__).rsplit('/', 2)[0] + '/webroot'
 
 def server(socket, address):
     """Set up a server socket, receive and send back a msg to a client."""
-    # print('hi')
-    # socket.sendall(b'he')
     while True:
         print('started')
-        #server = server_socket
-        #address = ('127.0.0.1', 5000)
-        #server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        #server.bind(address)
-        #socket.listen(1)
-        #conn, addr = socket.accept()
         buffer_length = 32
         message_complete = False
         request = b''
