@@ -6,7 +6,6 @@ import io
 import email.utils
 from mimetypes import guess_type
 import os
-import pdb
 
 
 CRLF = '\r\n'
@@ -34,11 +33,6 @@ def server():
                 unicode_request = request.decode('utf8')
         print(u'request:\r\n', unicode_request)
         response = response_decision(request)
-        # try:
-        # response = response.encode('utf-8')
-        # except (UnicodeDecodeError, AttributeError):
-        #    pass
-        print('this is the response: ', response, type(response))
         conn.sendall(response)
         conn.close()
         server.close()
@@ -61,11 +55,8 @@ def response_ok(body, mime=None):
     header_lines = [': '.join(item) for item in headers.items()]
     lines.extend(header_lines)
     lines.append('')
-    print('lines before CRLF: ', lines, type(lines))
     response = CRLF.join(lines) + CRLF
-    print('after CRLF', response, type(response))
     response = response.encode('utf8')
-    print('after encode', response, type(response))
     response += body
     return response
 
@@ -75,7 +66,6 @@ def response_deconstructor(response):
     Return protocol, status, status message,
     headers as dictionary, length of body, number of components
     separated by first empty line."""
-    pdb.set_trace
     response_msg = response
     delimeter = (CRLF+CRLF).encode('utf-8')
     first_pass = response_msg.split(delimeter, 1)
@@ -159,22 +149,18 @@ def response_decision(request):
     else:
         uri = parse_req(request)
         response = generate_response(uri)
-        print('response_decision response:', response)
     return response
 
 
 def resolve_uri(uri):
     """Return body and mimetype for a given uri or False if
      source not found."""
-    print('resolve_uri print uri: ', uri)
     path = HERE + uri
-    print('resolve_uri print path: ', path)
     if os.path.isfile(path):
         files = io.open(path, 'rb')
         mime = guess_type(path)
         read_file = files.read()
         files.close()
-        print('read_file: ', read_file, 'mime: ', mime)
         return (read_file, mime)
     elif os.path.isdir(path):
         return (path, None)
