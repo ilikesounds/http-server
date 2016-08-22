@@ -13,19 +13,18 @@ ABS_PATH = os.path.abspath(__file__).rsplit('/', 2)[0] + '/webroot'
 
 def server(socket, address):
     """Set up a server socket, receive and send back a msg to a client."""
-    while True:
-        print('started')
-        buffer_length = 32
-        message_complete = False
-        request = b''
-        while not message_complete:
-            buffer_req = socket.recv(buffer_length)
-            request += buffer_req
-            if len(buffer_req) < buffer_length:
-                message_complete = True
-        response = response_decision(request)
-        socket.sendall(response)
-        socket.close()
+    print('started')
+    buffer_length = 32
+    message_complete = False
+    request = b''
+    while not message_complete:
+        buffer_req = socket.recv(buffer_length)
+        request += buffer_req
+        if len(buffer_req) < buffer_length:
+            message_complete = True
+    response = response_decision(request)
+    socket.sendall(response)
+    socket.close()
 
 
 def response_ok(body, mime=None):
